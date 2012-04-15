@@ -51,36 +51,30 @@ valuenames[0x18..0x1d] = [
 ]
 
 sampleCode = """
+	7c01 0030
+	7de1 1000 0020
+	7803 1000
+	c00d 
+	7dc1 001a
 
-7c01 0030
-7de1 1000 0020
-7803 1000
-c00d 
-7dc1 001a
+	a861
+	7c01 2000
+	2161 2000
+	8463
+	806d
+	7dc1 000d
 
-a861
-7c01 2000
-2161 2000
-8463
-806d
-7dc1 000d
+	9031
+	7c10 0018 
+	7dc1 001a
 
-9031
-7c10 0018 
-7dc1 001a
+	9037
+	61c1
 
-9037
-61c1
-
-7dc1 001a
+	7dc1 001a
 """
 
-# words = [0x7c01, 0x0030, 0x7dc1, 0x000d]
-
 words = sampleCode.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
-
-log words
-
 
 pos = 0
 next = -> words[pos++]
@@ -111,7 +105,7 @@ decode = ->
 			mask = (1 << bits) - 1
 			result = word & mask
 			word >>= bits
-	#		log "mask #{hex mask}, result #{hex result}, remnants of word #{hex word}"
+#			log "mask #{hex mask}, result #{hex result}, remnants of word #{hex word}"
 			result
 
 		op = take 4
@@ -122,6 +116,7 @@ decode = ->
 		aname = printval a
 		bname = printval b
 
+#		log "  #{hex op}, #{hex a}, #{hex b}"
 		log "  #{opname} #{aname}, #{bname}"
 
 decode()
