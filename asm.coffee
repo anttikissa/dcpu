@@ -99,7 +99,7 @@ printval = (value) ->
 	else if value == 0x1f
 		"#{hex next()}"
 	else if value in [0x20..0x3f]
-		hex value & 0x20
+		hex2 value & 0x1f
 	else
 		"unknown value #{hex value}"
 #	value
