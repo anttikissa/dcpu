@@ -34,6 +34,11 @@ opnames = [
 	'ifb'
 ]
 
+opnamesExt = [
+	'reserved'
+	'jsr'
+]
+
 regnames = [
 	'a', 'b', 'c',
 	'x', 'y', 'z',
@@ -113,10 +118,19 @@ decode = ->
 		b = take 6
 
 		opname = opnames[op]
+		if opname == 'ext'
+			op = a
+			a = b
+			b = undefined
+			opname = opnamesExt[op]
+
 		aname = printval a
-		bname = printval b
+		bname = printval b if b
 
 #		log "  #{hex op}, #{hex a}, #{hex b}"
-		log "  #{opname} #{aname}, #{bname}"
+		if b
+			log "  #{opname} #{aname}, #{bname}"
+		else
+			log "  #{opname} #{aname}"
 
 decode()
