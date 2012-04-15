@@ -8,7 +8,6 @@ padWithZeros = (length, string) ->
 hex = (word) ->
 	"0x#{padWithZeros 4, word.toString 16}"
 
-
 opnames = [
 	'ext'
 	'set'
@@ -47,7 +46,38 @@ valuenames[0x18..0x1d] = [
 	'o'
 ]
 
-words = [0x7c01, 0x0030, 0x7dc1, 0x000d]
+sampleCode = """
+
+7c01 0030
+7de1 1000 0020
+7803 1000
+c00d 
+7dc1 001a
+
+a861
+7c01 2000
+2161 2000
+8463
+806d
+7dc1 000d
+
+9031
+7c10 0018 
+7dc1 001a
+
+9037
+61c1
+
+7dc1 001a
+"""
+
+# words = [0x7c01, 0x0030, 0x7dc1, 0x000d]
+
+words = sampleCode.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
+
+log words
+
+
 pos = 0
 next = -> words[pos++]
 
