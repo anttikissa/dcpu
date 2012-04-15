@@ -8,6 +8,10 @@ padWithZeros = (length, string) ->
 hex = (word) ->
 	"0x#{padWithZeros 4, word.toString 16}"
 
+hex2 = (word) ->
+	"0x#{padWithZeros 2, word.toString 16}"
+
+
 opnames = [
 	'ext'
 	'set'
