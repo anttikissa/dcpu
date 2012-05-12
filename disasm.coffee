@@ -51,12 +51,12 @@ regnames = [
 
 valuenames = new Array(0x1d)
 valuenames[0x18..0x1d] = [
-	'[sp++]'
+	'[--sp] or [sp++]'
 	'[sp]'
-	'[--sp]'
+	'[sp + next]' # won't be displayed
 	'sp'
 	'pc'
-	'o'
+	'ex'
 ]
 
 # Usage:
@@ -90,6 +90,8 @@ class Disassembler
 				'[' + regnames[value & 0x07] + ']'
 			else if value in [0x10..0x17]
 				"[#{hex next()} + " + regnames[value & 0x07] + ']'
+			else if value == 0x1a
+				"[sp + #{hex next()}"
 			else if value in [0x18..0x1d]
 				valuenames[value]
 			else if value == 0x1e
@@ -109,9 +111,9 @@ class Disassembler
 					word >>= bits
 					result
 
-				op = take 4
+				op = take 5
+				b = take 5
 				a = take 6
-				b = take 6
 
 				opname = opnames[op] || "<op #{op}>"
 				if opname == 'ext'
