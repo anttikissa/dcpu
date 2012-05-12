@@ -71,7 +71,7 @@ class Disassembler
 		@words = []
 		if buffer.length
 			for i in [0..buffer.length / 2 - 1]
-				@words.push buffer.readUInt16LE i
+				@words.push buffer.readUInt16BE 2*i
 		
 	# code is a sequence of 16-bit hex words separated by whitespace.
 	setCode: (code) ->
@@ -159,7 +159,7 @@ d = new Disassembler()
 #d.setCode sampleCode
 #d.disasm()
 
-filename = 'samples/colortest.img'
+filename = 'samples/sample.img'
 fs.readFile filename, (err, result) ->
 	if err
 		fail "error reading #{filename}"
