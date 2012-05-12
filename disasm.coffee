@@ -55,31 +55,8 @@ valuenames[0x18..0x1d] = [
 	'o'
 ]
 
-disasm = ->
-	code = """
-		7c01 0030
-		7de1 1000 0020
-		7803 1000
-		c00d 
-		7dc1 001a
-
-		a861
-		7c01 2000
-		2161 2000
-		8463
-		806d
-		7dc1 000d
-
-		9031
-		7c10 0018 
-		7dc1 001a
-
-		9037
-		61c1
-
-		7dc1 001a
-	"""
-
+# code is a sequence of 16-bit hex words separated by whitespace.
+disasm = (code) ->
 	words = code.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
 
 	pos = 0
@@ -102,8 +79,6 @@ disasm = ->
 			hex2 value & 0x1f
 		else
 			"unknown value #{hex value}"
-	#	value
-	#	if value 
 
 	decode = ->
 		while word = next()
@@ -111,7 +86,6 @@ disasm = ->
 				mask = (1 << bits) - 1
 				result = word & mask
 				word >>= bits
-	#			log "mask #{hex mask}, result #{hex result}, remnants of word #{hex word}"
 				result
 
 			op = take 4
@@ -129,7 +103,6 @@ disasm = ->
 			aname = printval a
 			bname = printval b if b
 
-	#		log "  #{hex op}, #{hex a}, #{hex b}"
 			if b
 				log "  #{opname} #{aname}, #{bname}"
 			else
@@ -137,5 +110,29 @@ disasm = ->
 
 	decode()
 
-disasm()
+sampleCode = """
+	7c01 0030
+	7de1 1000 0020
+	7803 1000
+	c00d 
+	7dc1 001a
+
+	a861
+	7c01 2000
+	2161 2000
+	8463
+	806d
+	7dc1 000d
+
+	9031
+	7c10 0018 
+	7dc1 001a
+
+	9037
+	61c1
+
+	7dc1 001a
+"""
+
+disasm(code)
 
