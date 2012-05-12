@@ -17,30 +17,71 @@ hex2 = (word) ->
 
 
 opnames = [
-	'<special>'
+	'<n/a 0x00>'
 	'set'
 	'add'
 	'sub'
 
 	'mul'
+	'mli'
 	'div'
-	'mod'
-	'shl'
+	'dvi'
 
-	'shr'
+	'mod'
+	'mdi'
 	'and'
 	'bor'
+	
 	'xor'
+	'shr'
+	'asr'
+	'shl'
 
+	'ifb'
+	'ifc'
 	'ife'
 	'ifn'
+
 	'ifg'
-	'ifb'
+	'ifa'
+	'ifl'
+	'ifu'
+
+	'<n/a 0x18>'
+	'<n/a 0x19>'
+	'adx'
+	'sbx'
+
+	'<n/a 0x1c>'
+	'<n/a 0x1d>'
+	'sti'
+	'std'
 ]
 
 opnamesExt = [
 	'reserved'
 	'jsr'
+	'<n/a 0x02>'
+	'<n/a 0x03>'
+
+	'<n/a 0x04>'
+	'<n/a 0x05>'
+	'<n/a 0x06>'
+	'<n/a 0x07>'
+
+	'int'
+	'iag'
+	'ias'
+	'rfi'
+
+	'iaq'
+	'<n/a 0x0d>'
+	'<n/a 0x0e>'
+	'<n/a 0x0f>'
+
+	'hwn'
+	'hwq'
+	'hwi'
 ]
 
 regnames = [
@@ -99,7 +140,7 @@ class Disassembler
 			else if value == 0x1f
 				"#{hex next()}"
 			else if value in [0x20..0x3f]
-				hex2 value & 0x1f
+				hex2 (value & 0x1f) - 1
 			else
 				"<value #{hex value}>"
 
@@ -118,6 +159,7 @@ class Disassembler
 					assert zeros == 0
 					op = take 5
 					a = take 6
+					b = undefined
 					opname = opnamesExt[op] || "<special #{hex2 op}>"
 				else
 					op = take 5
@@ -126,12 +168,14 @@ class Disassembler
 					opname = opnames[op] || "<op #{hex2 op}>"
 
 				aname = printval a
-				bname = printval b if b
+				bname = printval b if b?
 
-				if b
-					log "  #{opname} #{aname}, #{bname}"
+				comment = ""
+#				comment = "\t\t; b is #{b}, a is #{a}"
+				if b?
+					log "  #{opname} #{bname}, #{aname}#{comment}" 
 				else
-					log "  #{opname} #{aname}"
+					log "  #{opname} #{aname}#{comment}"
 
 		decode()
 
