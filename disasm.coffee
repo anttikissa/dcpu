@@ -17,7 +17,7 @@ hex2 = (word) ->
 
 
 opnames = [
-	'ext'
+	'<special>'
 	'set'
 	'add'
 	'sub'
@@ -111,17 +111,19 @@ class Disassembler
 					word >>= bits
 					result
 
-				op = take 5
-				b = take 5
-				a = take 6
+				isSpecial = (word & (1 << 5) - 1) == 0
 
-				opname = opnames[op] || "<op #{op}>"
-				if opname == 'ext'
-					op = a
-					a = b
-					b = undefined
-					log "  #{hex op}, #{hex a}"
-					opname = opnamesExt[op] || "<op #{op}>"
+				if isSpecial
+					zeros = take 5
+					assert zeros == 0
+					op = take 5
+					a = take 6
+					opname = opnamesExt[op] || "<special #{hex2 op}>"
+				else
+					op = take 5
+					b = take 5
+					a = take 6
+					opname = opnames[op] || "<op #{hex2 op}>"
 
 				aname = printval a
 				bname = printval b if b
