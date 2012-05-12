@@ -92,7 +92,7 @@ regnames = [
 
 valuenames = new Array(0x1d)
 valuenames[0x18..0x1d] = [
-	'[--sp] or [sp++]'
+	'push/pop'
 	'[sp]'
 	'[sp + next]' # won't be displayed
 	'sp'
@@ -124,7 +124,7 @@ class Disassembler
 		pos = 0
 		next = => @words[pos++]
 
-		printval = (value) ->
+		printval = (value, lhs) ->
 			if value in [0x00..0x07]
 				regnames[value]
 			else if value in [0x08..0x0f]
@@ -134,7 +134,13 @@ class Disassembler
 			else if value == 0x1a
 				"[sp + #{hex next()}"
 			else if value in [0x18..0x1d]
-				valuenames[value]
+				val = valuenames[value]
+				if val == 'push/pop'
+					if lhs
+						val = '[--sp]'
+					else
+						val = '[sp++]'
+				val
 			else if value == 0x1e
 				"[#{hex next()}]"
 			else if value == 0x1f
@@ -167,8 +173,8 @@ class Disassembler
 					a = take 6
 					opname = opnames[op] || "<op #{hex2 op}>"
 
-				aname = printval a
-				bname = printval b if b?
+				aname = printval a, false
+				bname = printval b, true if b?
 
 				comment = ""
 #				comment = "\t\t; b is #{b}, a is #{a}"
