@@ -1,6 +1,8 @@
 assert = require 'assert'
+fs = require 'fs'
 
 log = (msg) -> console.log msg
+fail = (msg) -> console.error msg; throw msg
 
 padWithZeros = (length, string) ->
 	while string.length < length
@@ -63,6 +65,14 @@ valuenames[0x18..0x1d] = [
 # d.setCode "1234 5678 <...>"
 # d.disasm()
 class Disassembler
+	# img is a buffer containing binary code in little endian
+	setImg: (buffer) ->
+		assert buffer.length % 2 == 0, "odd buffer length #{buffer.length}"
+		@words = []
+		if buffer.length
+			for i in [0..buffer.length / 2 - 1]
+				@words.push buffer.readUInt16LE i
+		
 	# code is a sequence of 16-bit hex words separated by whitespace.
 	setCode: (code) ->
 		@words = code.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
@@ -146,6 +156,13 @@ sampleCode = """
 """
 
 d = new Disassembler()
-d.setCode sampleCode
-d.disasm()
+#d.setCode sampleCode
+#d.disasm()
+
+filename = 'samples/colortest.img'
+fs.readFile filename, (err, result) ->
+	if err
+		fail "error reading #{filename}"
+	d.setImg result
+	d.disasm()
 
