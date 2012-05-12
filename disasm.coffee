@@ -99,7 +99,7 @@ class Disassembler
 			else if value in [0x20..0x3f]
 				hex2 value & 0x1f
 			else
-				"unknown value #{hex value}"
+				"<value #{hex value}>"
 
 		decode = ->
 			while word = next()
@@ -113,13 +113,13 @@ class Disassembler
 				a = take 6
 				b = take 6
 
-				opname = opnames[op]
+				opname = opnames[op] || "<op #{op}>"
 				if opname == 'ext'
 					op = a
 					a = b
 					b = undefined
 					log "  #{hex op}, #{hex a}"
-					opname = opnamesExt[op]
+					opname = opnamesExt[op] || "<op #{op}>"
 
 				aname = printval a
 				bname = printval b if b
@@ -159,7 +159,7 @@ d = new Disassembler()
 #d.setCode sampleCode
 #d.disasm()
 
-filename = 'samples/sample.img'
+filename = 'samples/colortest.img'
 fs.readFile filename, (err, result) ->
 	if err
 		fail "error reading #{filename}"
