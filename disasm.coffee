@@ -1,3 +1,5 @@
+assert = require 'assert'
+
 log = (msg) -> console.log msg
 
 padWithZeros = (length, string) ->
@@ -55,60 +57,69 @@ valuenames[0x18..0x1d] = [
 	'o'
 ]
 
-# code is a sequence of 16-bit hex words separated by whitespace.
-disasm = (code) ->
-	words = code.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
+# Usage:
+#
+# d = new Disassembler()
+# d.setCode "1234 5678 <...>"
+# d.disasm()
+class Disassembler
+	# code is a sequence of 16-bit hex words separated by whitespace.
+	setCode: (code) ->
+		@words = code.split(/\s/).filter((s) -> s != '').map((s) -> parseInt s, 16)
 
-	pos = 0
-	next = -> words[pos++]
+	disasm: ->
+		assert @words, "@words undefined"
 
-	printval = (value) ->
-		if value in [0x00..0x07]
-			regnames[value]
-		else if value in [0x08..0x0f]
-			'[' + regnames[value & 0x07] + ']'
-		else if value in [0x10..0x17]
-			"[#{hex next()} + " + regnames[value & 0x07] + ']'
-		else if value in [0x18..0x1d]
-			valuenames[value]
-		else if value == 0x1e
-			"[#{hex next()}]"
-		else if value == 0x1f
-			"#{hex next()}"
-		else if value in [0x20..0x3f]
-			hex2 value & 0x1f
-		else
-			"unknown value #{hex value}"
+		pos = 0
+		next = => @words[pos++]
 
-	decode = ->
-		while word = next()
-			take = (bits) ->
-				mask = (1 << bits) - 1
-				result = word & mask
-				word >>= bits
-				result
-
-			op = take 4
-			a = take 6
-			b = take 6
-
-			opname = opnames[op]
-			if opname == 'ext'
-				op = a
-				a = b
-				b = undefined
-				log "  #{hex op}, #{hex a}"
-				opname = opnamesExt[op]
-
-			aname = printval a
-			bname = printval b if b
-
-			if b
-				log "  #{opname} #{aname}, #{bname}"
+		printval = (value) ->
+			if value in [0x00..0x07]
+				regnames[value]
+			else if value in [0x08..0x0f]
+				'[' + regnames[value & 0x07] + ']'
+			else if value in [0x10..0x17]
+				"[#{hex next()} + " + regnames[value & 0x07] + ']'
+			else if value in [0x18..0x1d]
+				valuenames[value]
+			else if value == 0x1e
+				"[#{hex next()}]"
+			else if value == 0x1f
+				"#{hex next()}"
+			else if value in [0x20..0x3f]
+				hex2 value & 0x1f
 			else
-				log "  #{opname} #{aname}"
+				"unknown value #{hex value}"
 
-	decode()
+		decode = ->
+			while word = next()
+				take = (bits) ->
+					mask = (1 << bits) - 1
+					result = word & mask
+					word >>= bits
+					result
+
+				op = take 4
+				a = take 6
+				b = take 6
+
+				opname = opnames[op]
+				if opname == 'ext'
+					op = a
+					a = b
+					b = undefined
+					log "  #{hex op}, #{hex a}"
+					opname = opnamesExt[op]
+
+				aname = printval a
+				bname = printval b if b
+
+				if b
+					log "  #{opname} #{aname}, #{bname}"
+				else
+					log "  #{opname} #{aname}"
+
+		decode()
 
 sampleCode = """
 	7c01 0030
@@ -134,5 +145,7 @@ sampleCode = """
 	7dc1 001a
 """
 
-disasm(code)
+d = new Disassembler()
+d.setCode sampleCode
+d.disasm()
 
